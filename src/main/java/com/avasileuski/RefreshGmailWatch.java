@@ -1,4 +1,4 @@
-package com.aliakseivasileuski;
+package com.avasileuski;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
