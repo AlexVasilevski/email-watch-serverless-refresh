@@ -43,8 +43,8 @@ jobs:
       # 5. Deploy Cloud Function
       - name: Deploy Cloud Function
         run: |
-          gcloud functions deploy email-notification-processor \
-            --entry-point=com.avasileuski.GmailNotificationProcessor \
+          gcloud functions deploy email-watch-serverless-refresh \
+            --entry-point=com.avasileuski.RefreshGmailWatch \
             --runtime=java21 \
             --trigger-http \
             --region=europe-central2 \
