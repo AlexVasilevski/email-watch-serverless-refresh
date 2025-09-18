@@ -1,5 +1,6 @@
 package com.avasileuski;
 
+import com.avasileuski.helper.SecretHelper;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.gmail.Gmail;
@@ -17,12 +18,14 @@ import com.google.cloud.functions.HttpRequest;
 import com.google.cloud.functions.HttpResponse;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import static com.avasileuski.helper.EnvHelper.getEnvRequired;
+import static com.avasileuski.helper.SecretHelper.getSecret;
 
 
 public class RefreshGmailWatch implements HttpFunction {
@@ -46,15 +49,15 @@ public class RefreshGmailWatch implements HttpFunction {
     static {
         try {
             GMAIL = buildGmailServiceOAuth();
-        } catch (GeneralSecurityException | IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static Gmail buildGmailServiceOAuth() throws GeneralSecurityException, IOException {
-        String clientId = getEnvRequired(GMAIL_CLIENT_ID);
-        String clientSecret = getEnvRequired(GMAIL_CLIENT_SECRET);
-        String refreshToken = getEnvRequired(GMAIL_REFRESH_TOKEN);
+    private static Gmail buildGmailServiceOAuth() throws Exception {
+        String clientId = getSecret(GMAIL_CLIENT_ID);
+        String clientSecret = getSecret(GMAIL_CLIENT_SECRET);
+        String refreshToken = getSecret(GMAIL_REFRESH_TOKEN);
         String applicationName = getEnvRequired(APPLICATION_NAME);
 
         GoogleCredentials userCredentials = UserCredentials.newBuilder()
@@ -70,14 +73,6 @@ public class RefreshGmailWatch implements HttpFunction {
                 new HttpCredentialsAdapter(userCredentials))
                 .setApplicationName(applicationName)
                 .build();
-    }
-
-    private static String getEnvRequired(String key) {
-        String v = System.getenv(key);
-        if (v == null || v.isBlank()) {
-            throw new IllegalStateException("Missing required env var: " + key);
-        }
-        return v;
     }
 
     public WatchResponse sendWatchRequest(String topicName, List<String> desiredLabelIds) throws IOException {
